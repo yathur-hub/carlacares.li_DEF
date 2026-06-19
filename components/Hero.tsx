@@ -3,15 +3,42 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import DBTTool from './DBTTool';
 import { ShieldCheck, Award, GraduationCap, HeartHandshake } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Hero: React.FC = () => {
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.12,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1],
+      },
+    },
+  };
+
   return (
     <section className="bg-white pt-8 md:pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16 md:mb-24">
           {/* Left Content */}
-          <div className="space-y-8 animate-in fade-in slide-in-from-left duration-700">
-            <div className="space-y-3">
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
+          >
+            <motion.div variants={itemVariants} className="space-y-3">
               <div className="space-y-1">
                 <span className="text-accentBrown font-bold uppercase tracking-wider text-xs block">
                   Ambulante psychiatrische Pflege in Liechtenstein
@@ -23,13 +50,13 @@ const Hero: React.FC = () => {
               <h1 className="text-4xl md:text-6xl font-extrabold text-accentGreen leading-[1.1] tracking-tight">
                 Ambulante psychiatrische Pflege, die im Alltag ankommt.
               </h1>
-            </div>
+            </motion.div>
 
-            <p className="text-lg md:text-xl text-textDark/70 leading-relaxed max-w-xl">
+            <motion.p variants={itemVariants} className="text-lg md:text-xl text-textDark/70 leading-relaxed max-w-xl">
               CarlaCares begleitet Menschen mit psychischen Belastungen zu Hause und im Alltag – persönlich, fachlich fundiert und auf Augenhöhe.
-            </p>
+            </motion.p>
 
-            <div className="space-y-6 pt-4">
+            <motion.div variants={itemVariants} className="space-y-6 pt-4">
               <div className="flex flex-wrap gap-4">
                 <Link 
                   to="/kontakt" 
@@ -49,8 +76,8 @@ const Hero: React.FC = () => {
                 <span className="flex h-2 w-2 rounded-full bg-accentBrown"></span>
                 <span>Aufsuchend. Alltagsnah. Verlässlich.</span>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Right Visual: DBT Immediate Help Tool */}
           <div className="relative animate-in fade-in slide-in-from-right duration-1000">
@@ -61,7 +88,12 @@ const Hero: React.FC = () => {
         </div>
 
         {/* Trust Bar */}
-        <div className="border-t border-gray-100/50 pt-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="border-t border-gray-100/50 pt-10"
+        >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
              {/* Badge 1 */}
              <div className="bg-secondary/25 hover:bg-secondary/50 p-4 md:p-5 rounded-3xl border border-gray-100/40 flex items-center space-x-3.5 transition-all duration-300 hover:shadow-sm group">
@@ -104,7 +136,7 @@ const Hero: React.FC = () => {
                 </div>
              </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

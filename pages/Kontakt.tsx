@@ -14,7 +14,7 @@ const Kontakt: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [validationError, setValidationError] = useState('');
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState('');
 
   const requesterOptions = [
@@ -48,22 +48,67 @@ const Kontakt: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const errors: Record<string, string> = {};
+    if (!formData.salutation) errors.salutation = 'Bitte wählen Sie eine Anrede aus.';
+    if (!formData.firstName.trim()) errors.firstName = 'Bitte geben Sie Ihren Vornamen ein.';
+    if (!formData.lastName.trim()) errors.lastName = 'Bitte geben Sie Ihren Nachnamen ein.';
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Bitte geben Sie Ihre E-Mail-Adresse ein.';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
+    }
+    
     if (!formData.requesterType) {
-      setValidationError('Bitte wähle aus, in welcher Rolle du dich meldest.');
-      const element = document.getElementById('requester-type-container');
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      return;
-    } else {
-      setValidationError('');
+      errors.requesterType = 'Bitte wählen Sie aus, in welcher Rolle Sie sich melden.';
+    }
+    
+    if (!formData.message.trim()) {
+      errors.message = 'Bitte geben Sie eine Nachricht ein.';
     }
 
+    const consentCheckbox = document.getElementById('consent') as HTMLInputElement | null;
+    if (consentCheckbox && !consentCheckbox.checked) {
+      errors.consent = 'Bitte willigen Sie in die Datenverarbeitung ein.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      
+      const firstErrorField = Object.keys(errors)[0];
+      const targetId = firstErrorField === 'requesterType' 
+        ? 'requester-type-container' 
+        : firstErrorField === 'consent' 
+        ? 'consent-container' 
+        : firstErrorField;
+        
+      const element = document.getElementById(targetId);
+      if (element) {
+        const offset = -120;
+        const y = element.getBoundingClientRect().top + window.scrollY + offset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        
+        element.classList.add('ring-2', 'ring-red-600/10', 'border-red-400');
+        setTimeout(() => {
+          element.classList.remove('ring-2', 'ring-red-600/10', 'border-red-400');
+        }, 3000);
+      }
+      return;
+    }
+
+    setFormErrors({});
     setIsSubmitting(true);
     setApiError('');
 
     try {
-      const response = await fetch("/api/contact", {
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
+
+      if (!webhookUrl) {
+        console.error("VITE_N8N_WEBHOOK_URL ist nicht gesetzt.");
+        throw new Error("Formular-Endpunkt ist nicht konfiguriert.");
+      }
+
+      const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -74,8 +119,8 @@ const Kontakt: React.FC = () => {
           lastName: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-          subject: formData.subject,
           requesterType: formData.requesterType,
+          subject: formData.subject,
           message: formData.message,
           pageUrl: window.location.href,
           source: "carlacares.li Kontaktformular"
@@ -108,6 +153,13 @@ const Kontakt: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors(prev => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
   };
 
   const carlaImageUrl = "https://raw.githubusercontent.com/yathur-hub/carlacares_BrandAssets/main/Carla.JPG";
@@ -233,7 +285,7 @@ const Kontakt: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form onSubmit={handleSubmit} noValidate className="space-y-8">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold text-accentGreen">Nimm unverbindlich Kontakt auf</h3>
                   <p className="text-sm text-textDark/70">
@@ -254,7 +306,9 @@ const Kontakt: React.FC = () => {
                         required
                         value={formData.salutation}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark text-sm appearance-none cursor-pointer"
+                        className={`w-full px-4 py-3 bg-secondary border rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark text-sm appearance-none cursor-pointer ${
+                          formErrors.salutation ? 'border-red-300 ring-2 ring-red-500/10' : 'border-gray-100'
+                        }`}
                       >
                         <option value="" disabled hidden>Anrede</option>
                         <option value="Frau">Frau</option>
@@ -268,6 +322,11 @@ const Kontakt: React.FC = () => {
                         </svg>
                       </div>
                     </div>
+                    {formErrors.salutation && (
+                      <p className="text-xs font-bold text-red-600 animate-in fade-in slide-in-from-top-1 duration-250 mt-1 pl-1">
+                        {formErrors.salutation}
+                      </p>
+                    )}
                   </div>
 
                   {/* Vorname */}
@@ -283,8 +342,15 @@ const Kontakt: React.FC = () => {
                       value={formData.firstName}
                       onChange={handleChange}
                       placeholder="Vorname"
-                      className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm"
+                      className={`w-full px-4 py-3 bg-secondary border rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm ${
+                        formErrors.firstName ? 'border-red-300 ring-2 ring-red-500/10' : 'border-gray-100'
+                      }`}
                     />
+                    {formErrors.firstName && (
+                      <p className="text-xs font-bold text-red-600 animate-in fade-in slide-in-from-top-1 duration-250 mt-1 pl-1">
+                        {formErrors.firstName}
+                      </p>
+                    )}
                   </div>
 
                   {/* Nachname */}
@@ -300,8 +366,15 @@ const Kontakt: React.FC = () => {
                       value={formData.lastName}
                       onChange={handleChange}
                       placeholder="Nachname"
-                      className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm"
+                      className={`w-full px-4 py-3 bg-secondary border rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm ${
+                        formErrors.lastName ? 'border-red-300 ring-2 ring-red-500/10' : 'border-gray-100'
+                      }`}
                     />
+                    {formErrors.lastName && (
+                      <p className="text-xs font-bold text-red-600 animate-in fade-in slide-in-from-top-1 duration-250 mt-1 pl-1">
+                        {formErrors.lastName}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -318,8 +391,15 @@ const Kontakt: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="beispiel@domain.com"
-                    className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm"
+                    className={`w-full px-4 py-3 bg-secondary border rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm ${
+                      formErrors.email ? 'border-red-300 ring-2 ring-red-500/10' : 'border-gray-100'
+                    }`}
                   />
+                  {formErrors.email && (
+                    <p className="text-xs font-bold text-red-600 animate-in fade-in slide-in-from-top-1 duration-250 mt-1 pl-1">
+                      {formErrors.email}
+                    </p>
+                  )}
                 </div>
 
                 {/* Ich melde mich als select cards */}
@@ -336,7 +416,13 @@ const Kontakt: React.FC = () => {
                           type="button"
                           onClick={() => {
                             setFormData(prev => ({ ...prev, requesterType: opt.id }));
-                            if (validationError) setValidationError('');
+                            if (formErrors.requesterType) {
+                              setFormErrors(prev => {
+                                const next = { ...prev };
+                                delete next.requesterType;
+                                return next;
+                              });
+                            }
                           }}
                           className={`px-4 py-3.5 rounded-xl border text-sm font-semibold transition-all text-left flex items-center justify-between cursor-pointer focus:outline-none focus:ring-2 focus:ring-accentGreen/20 ${
                             isSelected
@@ -354,8 +440,10 @@ const Kontakt: React.FC = () => {
                       );
                     })}
                   </div>
-                  {validationError && (
-                    <p className="text-sm font-bold text-red-600 pl-1">{validationError}</p>
+                  {formErrors.requesterType && (
+                    <p className="text-xs font-bold text-red-600 pl-1 animate-in fade-in slide-in-from-top-1 duration-250 mt-1">
+                      {formErrors.requesterType}
+                    </p>
                   )}
                 </div>
 
@@ -423,19 +511,49 @@ const Kontakt: React.FC = () => {
                     value={formData.message}
                     onChange={handleChange}
                     placeholder={formData.requesterType ? getMessageHelperText() : "Wie kann ich Ihnen helfen? Beschreiben Sie kurz Ihr Anliegen..."}
-                    className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm resize-none"
+                    className={`w-full px-4 py-3 bg-secondary border rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm resize-none ${
+                      formErrors.message ? 'border-red-300 ring-2 ring-red-500/10' : 'border-gray-100'
+                    }`}
                   ></textarea>
+                  {formErrors.message && (
+                    <p className="text-xs font-bold text-red-600 animate-in fade-in slide-in-from-top-1 duration-250 pl-1">
+                      {formErrors.message}
+                    </p>
+                  )}
                 </div>
 
-                <div className="text-xs text-textDark/40 flex items-start gap-2">
-                  <input type="checkbox" id="consent" required className="mt-0.5 rounded cursor-pointer" />
-                  <label htmlFor="consent" className="cursor-pointer select-none">
-                    Ich willige ein, dass meine Daten zur Bearbeitung der Anfrage elektronisch verarbeitet und sicher gespeichert werden. Ein Zugriff erfolgt ausschliesslich durch CarlaCares.
-                  </label>
+                <div id="consent-container" className={`text-xs text-textDark/40 flex flex-col gap-2 p-3 rounded-xl border transition-all ${
+                  formErrors.consent ? 'border-red-200 bg-red-50/20' : 'border-transparent'
+                }`}>
+                  <div className="flex items-start gap-2">
+                    <input 
+                      type="checkbox" 
+                      id="consent" 
+                      required 
+                      className="mt-0.5 rounded cursor-pointer" 
+                      onChange={(e) => {
+                        if (e.target.checked && formErrors.consent) {
+                          setFormErrors(prev => {
+                            const next = { ...prev };
+                            delete next.consent;
+                            return next;
+                          });
+                        }
+                      }}
+                    />
+                    <label htmlFor="consent" className="cursor-pointer select-none">
+                      Ich willige ein, dass meine Daten zur Bearbeitung der Anfrage elektronisch verarbeitet und sicher gespeichert werden. Ein Zugriff erfolgt ausschliesslich durch CarlaCares.
+                    </label>
+                  </div>
+                  {formErrors.consent && (
+                    <p className="text-xs font-bold text-red-600 animate-in fade-in slide-in-from-top-1 duration-250 pl-1 mt-0.5">
+                      {formErrors.consent}
+                    </p>
+                  )}
                 </div>
 
                 {apiError && (
-                  <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600 font-medium">
+                  <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600 font-medium animate-in fade-in duration-200">
                     {apiError}
                   </div>
                 )}

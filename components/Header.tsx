@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,6 +14,26 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
 
   const navLinks = [
     { path: '/', label: 'Startseite' },
@@ -77,34 +98,43 @@ const Header: React.FC = () => {
       </div>
 
       {/* Persistent Overlay Menu */}
-      {isMobileMenuOpen && (
-        <div className="bg-white border-t border-gray-100 absolute w-full shadow-2xl animate-in slide-in-from-top duration-300 z-50">
-          <nav className="max-w-7xl mx-auto flex flex-col p-8 md:p-12 space-y-6 md:space-y-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-2xl md:text-4xl font-bold uppercase tracking-widest text-left transition-all hover:translate-x-2 ${
-                  location.pathname === link.path ? 'text-accentGreen' : 'text-textDark/40 hover:text-accentGreen'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row gap-6 md:gap-12">
-               <div className="space-y-2">
-                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accentBrown">Kontakt</p>
-                 <a href="mailto:carla@carlacares.li" className="block text-sm font-bold text-textDark hover:text-accentGreen">carla@carlacares.li</a>
-               </div>
-               <div className="space-y-2">
-                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accentBrown">Telefon</p>
-                 <a href="tel:+41791940718" className="block text-sm font-bold text-textDark hover:text-accentGreen">+41 79 194 07 18</a>
-               </div>
-            </div>
-          </nav>
-        </div>
-      )}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-white border-t border-gray-100 absolute w-full shadow-2xl z-50 left-0 right-0"
+          >
+            <nav className="max-w-7xl mx-auto flex flex-col p-8 md:p-12 space-y-4 md:space-y-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`text-2xl md:text-4xl font-bold uppercase tracking-widest text-left transition-all hover:translate-x-2 flex items-center h-12 md:h-16 ${
+                    location.pathname === link.path ? 'text-accentGreen' : 'text-textDark/40 hover:text-accentGreen'
+                  }`}
+                  style={{ minHeight: '48px' }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row gap-6 md:gap-12">
+                 <div className="space-y-2">
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accentBrown">Kontakt</p>
+                   <a href="mailto:carla@carlacares.li" className="block text-sm font-bold text-textDark hover:text-accentGreen">carla@carlacares.li</a>
+                 </div>
+                 <div className="space-y-2">
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accentBrown">Telefon</p>
+                   <a href="tel:+41791940718" className="block text-sm font-bold text-textDark hover:text-accentGreen">+41 79 194 07 18</a>
+                 </div>
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

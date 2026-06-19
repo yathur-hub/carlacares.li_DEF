@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, HelpCircle, AlertTriangle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface FAQItem {
   question: string;
@@ -111,18 +112,37 @@ const FAQSection: React.FC = () => {
                     <ChevronDown className="w-4 h-4" />
                   </div>
                 </button>
-                <div
-                  id={`faq-content-${idx}`}
-                  aria-labelledby={`faq-btn-${idx}`}
-                  role="region"
-                  className={`faq-grid-content ${isOpen ? 'is-open' : ''}`}
-                >
-                  <div className="faq-inner border-t border-gray-100">
-                    <div className="px-6 py-5 md:px-8 md:py-6 text-sm md:text-base text-textDark/75 leading-relaxed bg-secondary/15">
-                      {faq.answer}
-                    </div>
-                  </div>
-                </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      id={`faq-content-${idx}`}
+                      aria-labelledby={`faq-btn-${idx}`}
+                      role="region"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ 
+                        height: 'auto', 
+                        opacity: 1,
+                        transition: {
+                          height: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
+                          opacity: { duration: 0.25, ease: 'linear', delay: 0.05 }
+                        }
+                      }}
+                      exit={{ 
+                        height: 0, 
+                        opacity: 0,
+                        transition: {
+                          height: { duration: 0.25, ease: [0.16, 1, 0.3, 1] },
+                          opacity: { duration: 0.15, ease: 'linear' }
+                        }
+                      }}
+                      className="overflow-hidden border-t border-gray-100"
+                    >
+                      <div className="px-6 py-5 md:px-8 md:py-6 text-sm md:text-base text-textDark/75 leading-relaxed bg-secondary/15">
+                        {faq.answer}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
