@@ -3,7 +3,9 @@ import { Mail, Phone, MapPin, Clock, Send, CheckCircle2 } from 'lucide-react';
 
 const Kontakt: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    salutation: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     subject: 'Erstgespräch',
@@ -13,6 +15,7 @@ const Kontakt: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [validationError, setValidationError] = useState('');
+  const [apiError, setApiError] = useState('');
 
   const requesterOptions = [
     { id: 'Betroffene Person', label: 'Betroffene Person' },
@@ -42,7 +45,7 @@ const Kontakt: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.requesterType) {
@@ -57,20 +60,49 @@ const Kontakt: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    
-    // Simulate API request including the expanded payload
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: 'Erstgespräch',
-        requesterType: '',
-        message: ''
+    setApiError('');
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          salutation: formData.salutation,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          requesterType: formData.requesterType,
+          message: formData.message,
+          pageUrl: window.location.href,
+          source: "carlacares.li Kontaktformular"
+        })
       });
-    }, 1500);
+
+      if (response.ok) {
+        setIsSuccess(true);
+        setFormData({
+          salutation: '',
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          subject: 'Erstgespräch',
+          requesterType: '',
+          message: ''
+        });
+      } else {
+        throw new Error('Server respondierte mit einem Fehler-Status.');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setApiError('Die Anfrage konnte leider nicht versendet werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie CarlaCares direkt per E-Mail.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -188,9 +220,9 @@ const Kontakt: React.FC = () => {
                   <CheckCircle2 className="w-12 h-12 text-accentBrown" />
                 </div>
                 <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-accentGreen">Nachricht erfolgreich versendet</h3>
-                  <p className="text-textDark/60 max-w-md mx-auto">
-                    Danke für deine Anfrage. Carla meldet sich so bald wie möglich, um die nächsten Schritte zu besprechen.
+                  <h3 className="text-2xl font-bold text-accentGreen">Vielen Dank</h3>
+                  <p className="text-textDark/75 max-w-md mx-auto leading-relaxed">
+                    Ihre Anfrage wurde erfolgreich übermittelt. Carla meldet sich so bald wie möglich persönlich bei Ihnen.
                   </p>
                 </div>
                 <button
@@ -209,39 +241,85 @@ const Kontakt: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Name */}
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="block text-xs font-bold uppercase tracking-widest text-textDark/60">
-                      Name *
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-6">
+                  {/* Anrede */}
+                  <div className="space-y-2 sm:col-span-3">
+                    <label htmlFor="salutation" className="block text-xs font-bold uppercase tracking-widest text-textDark/60">
+                      Anrede *
+                    </label>
+                    <div className="relative">
+                      <select
+                        id="salutation"
+                        name="salutation"
+                        required
+                        value={formData.salutation}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark text-sm appearance-none cursor-pointer"
+                      >
+                        <option value="" disabled hidden>Anrede</option>
+                        <option value="Frau">Frau</option>
+                        <option value="Herr">Herr</option>
+                        <option value="Divers">Divers</option>
+                        <option value="Keine">Keine Angabe</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-accentBrown">
+                        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Vorname */}
+                  <div className="space-y-2 sm:col-span-4">
+                    <label htmlFor="firstName" className="block text-xs font-bold uppercase tracking-widest text-textDark/60">
+                      Vorname *
                     </label>
                     <input
                       type="text"
-                      id="name"
-                      name="name"
+                      id="firstName"
+                      name="firstName"
                       required
-                      value={formData.name}
+                      value={formData.firstName}
                       onChange={handleChange}
-                      placeholder="Ihr Vor- und Nachname"
+                      placeholder="Vorname"
                       className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm"
                     />
                   </div>
-                  {/* Email */}
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="block text-xs font-bold uppercase tracking-widest text-textDark/60">
-                      E-Mail-Adresse *
+
+                  {/* Nachname */}
+                  <div className="space-y-2 sm:col-span-5">
+                    <label htmlFor="lastName" className="block text-xs font-bold uppercase tracking-widest text-textDark/60">
+                      Nachname *
                     </label>
                     <input
-                      type="email"
-                      id="email"
-                      name="email"
+                      type="text"
+                      id="lastName"
+                      name="lastName"
                       required
-                      value={formData.email}
+                      value={formData.lastName}
                       onChange={handleChange}
-                      placeholder="beispiel@domain.com"
+                      placeholder="Nachname"
                       className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm"
                     />
                   </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-2">
+                  <label htmlFor="email" className="block text-xs font-bold uppercase tracking-widest text-textDark/60">
+                    E-Mail-Adresse *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="beispiel@domain.com"
+                    className="w-full px-4 py-3 bg-secondary border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-accentGreen/20 focus:border-accentBrown transition-all text-textDark placeholder-textDark/30 text-sm"
+                  />
                 </div>
 
                 {/* Ich melde mich als select cards */}
@@ -355,6 +433,12 @@ const Kontakt: React.FC = () => {
                     Ich willige ein, dass meine Daten zur Bearbeitung der Anfrage elektronisch verarbeitet und sicher gespeichert werden. Ein Zugriff erfolgt ausschliesslich durch CarlaCares.
                   </label>
                 </div>
+
+                {apiError && (
+                  <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600 font-medium">
+                    {apiError}
+                  </div>
+                )}
 
                 {/* Submit button */}
                 <button
