@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="de" class="scroll-pt-24">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambulante psychiatrische Pflege in Liechtenstein | CarlaCares</title>
+    <meta name="description" content="CarlaCares begleitet Menschen mit psychischen Belastungen zu Hause und im Alltag. Ambulante psychiatrische Pflege in Liechtenstein – persönlich, fachlich und auf Augenhöhe.">
+    <meta property="og:title" content="Ambulante psychiatrische Pflege in Liechtenstein | CarlaCares">
+    <meta property="og:description" content="Unterstützung im Alltag bei psychischen Belastungen – für Betroffene, Angehörige und zuweisende Fachstellen in Liechtenstein.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://carlacares.li/">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/yathur-hub/carlacares_BrandAssets/main/hand%20tree.png">
+    
+    <!-- Structured Data (JSON-LD) for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MedicalBusiness",
+      "name": "CarlaCares",
+      "url": "https://carlacares.li/",
+      "logo": "https://raw.githubusercontent.com/yathur-hub/carlacares_BrandAssets/main/hand%20tree.png",
+      "description": "Ambulante psychiatrische Pflege und Unterstützung im Alltag bei psychischen Belastungen in Liechtenstein.",
+      "areaServed": "Liechtenstein",
+      "serviceType": "Ambulante psychiatrische Pflege",
+      "knowsAbout": ["Ambulante psychiatrische Pflege", "Psychiatrische Spitex", "Unterstützung bei psychischen Belastungen"],
+      "availableLanguage": "de"
+    }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ffffff',
+                        secondary: '#f8f8f8',
+                        accentGreen: '#333f07',
+                        accentBrown: '#bc8d4b',
+                        textDark: '#545454',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 6rem; /* Ensures IDs don't hide under header */
+        }
+        body {
+            background-color: #ffffff;
+            color: #545454;
+        }
+        h1, h2, h3 {
+            color: #333f07;
+            font-weight: 700;
+        }
+        p {
+            line-height: 1.7;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "framer-motion": "https://esm.sh/framer-motion@^12.24.10"
+  }
+}
+</script>
+</head>
+<body class="font-sans antialiased text-textDark">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
