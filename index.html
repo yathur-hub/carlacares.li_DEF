@@ -65,6 +65,71 @@
         p {
             line-height: 1.7;
         }
+
+        /* --- GLOBAL TRANSITION LOGIC & INTERACTIVE STYLES --- */
+        a, button, input, textarea, select {
+            transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Gentle button transformations on hover & active */
+        a:hover, button:hover {
+            transform: translateY(-1px);
+        }
+        a:active, button:active {
+            transform: translateY(0);
+        }
+
+        /* Highlight focus outline professionally */
+        a:focus-visible, button:focus-visible, input:focus, textarea:focus, select:focus {
+            outline: 2px solid #333f07;
+            outline-offset: 2px;
+        }
+
+        /* Grid-based variable-height FAQ accordion style */
+        .faq-grid-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 250ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease-out;
+            opacity: 0;
+        }
+        .faq-grid-content.is-open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+        .faq-inner {
+            overflow: hidden;
+        }
+
+        /* Elegant card transformations on hover */
+        .card-interactive {
+            transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card-interactive:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -10px rgba(51, 63, 7, 0.08);
+            border-color: rgba(188, 141, 75, 0.2) !important;
+        }
+
+        /* --- PREFERS REDUCED MOTION --- */
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto !important;
+            }
+            *, *::before, *::after {
+                animation-delay: 0s !important;
+                animation-duration: 0s !important;
+                animation-iteration-count: 0 !important;
+                transition-delay: 0s !important;
+                transition-duration: 0s !important;
+                transform: none !important;
+                scroll-behavior: auto !important;
+            }
+            .scroll-reveal {
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
     </style>
 <script type="importmap">
 {

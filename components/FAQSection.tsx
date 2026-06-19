@@ -114,12 +114,13 @@ const FAQSection: React.FC = () => {
                 <div
                   id={`faq-content-${idx}`}
                   aria-labelledby={`faq-btn-${idx}`}
-                  className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isOpen ? 'max-h-96 border-t border-gray-150' : 'max-h-0'
-                  }`}
+                  role="region"
+                  className={`faq-grid-content ${isOpen ? 'is-open' : ''}`}
                 >
-                  <div className="px-6 py-5 md:px-8 md:py-6 text-sm md:text-base text-textDark/75 leading-relaxed bg-secondary/15">
-                    {faq.answer}
+                  <div className="faq-inner border-t border-gray-100">
+                    <div className="px-6 py-5 md:px-8 md:py-6 text-sm md:text-base text-textDark/75 leading-relaxed bg-secondary/15">
+                      {faq.answer}
+                    </div>
                   </div>
                 </div>
               </div>

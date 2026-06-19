@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Users, Shield, Compass, AlertCircle, ArrowRight } from 'lucide-react';
+import { Phone, Users, Shield, Compass, AlertCircle } from 'lucide-react';
+import ScrollReveal from './ScrollReveal';
 
 const SupportProcess: React.FC = () => {
   const steps = [
@@ -35,46 +36,49 @@ const SupportProcess: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-16">
         
         {/* Header Block */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <span className="text-accentBrown font-black uppercase tracking-[0.2em] text-xs">
-            Ablauf Begleitung
-          </span>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-accentGreen tracking-tight">
-            So funktioniert die Unterstützung
-          </h2>
-          <p className="text-lg text-textDark/60 leading-relaxed">
-            Der Einstieg ist bewusst einfach gehalten. Gemeinsam wird geklärt, ob und wie Carla im Alltag unterstützen kann – fachlich fundiert, persönlich und auf Augenhöhe.
-          </p>
-        </div>
+        <ScrollReveal duration={700}>
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <span className="text-accentBrown font-black uppercase tracking-[0.2em] text-xs">
+              Ablauf Begleitung
+            </span>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-accentGreen tracking-tight">
+              So funktioniert die Unterstützung
+            </h2>
+            <p className="text-lg text-textDark/60 leading-relaxed">
+              Der Einstieg ist bewusst einfach gehalten. Gemeinsam wird geklärt, ob und wie Carla im Alltag unterstützen kann – fachlich fundiert, persönlich und auf Augenhöhe.
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* Steps Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white p-8 rounded-[36px] border border-gray-100/70 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300 relative group"
-            >
-              <div className="space-y-6">
-                {/* Top layout: step number and icon */}
-                <div className="flex items-center justify-between">
-                  <span className="text-4xl font-extrabold text-accentGreen/15 tracking-tight select-none">
-                    {step.num}
-                  </span>
-                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center transition-colors group-hover:bg-accentBrown/10">
-                    {step.icon}
+            <ScrollReveal key={idx} delay={idx * 100} duration={650}>
+              <div 
+                className="bg-white p-8 rounded-[36px] border border-gray-100/70 shadow-sm flex flex-col h-full justify-between card-interactive relative group"
+              >
+                <div className="space-y-6">
+                  {/* Top layout: step number and icon */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-4xl font-extrabold text-accentGreen/15 tracking-tight select-none">
+                      {step.num}
+                    </span>
+                    <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center transition-colors group-hover:bg-accentBrown/10">
+                      {step.icon}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-accentGreen group-hover:text-accentBrown transition-colors">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-textDark/70 leading-relaxed">
+                      {step.description}
+                    </p>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-accentGreen group-hover:text-accentBrown transition-colors">
-                    {step.title}
-                  </h3>
-                  <p className="text-sm text-textDark/70 leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 

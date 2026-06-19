@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ClipboardList, Heading, HelpCircle, FileCheck, Coins, AlertCircle } from 'lucide-react';
+import { ClipboardList, HelpCircle, FileCheck, Coins } from 'lucide-react';
+import ScrollReveal from './ScrollReveal';
 
 const CostAndPrescriptionSection: React.FC = () => {
   const points = [
@@ -26,39 +27,42 @@ const CostAndPrescriptionSection: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-16">
         
         {/* Header Block */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <span className="text-accentBrown font-black uppercase tracking-[0.2em] text-xs">
-            Kosten & Verordnung
-          </span>
-          <h2 className="text-3xl md:text-5xl font-extrabold text-accentGreen tracking-tight">
-            Kosten, Verordnung und nächste Schritte
-          </h2>
-          <p className="text-lg text-textDark/60 leading-relaxed">
-            Ambulante psychiatrische Pflege kann in der Regel über die Krankenversicherung abgerechnet werden, wenn eine ärztliche Verordnung und eine fachliche Bedarfsabklärung vorliegen. Carla erklärt dir oder der zuweisenden Stelle, welche Schritte dafür notwendig sind.
-          </p>
-        </div>
+        <ScrollReveal duration={700}>
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <span className="text-accentBrown font-black uppercase tracking-[0.2em] text-xs">
+              Kosten & Verordnung
+            </span>
+            <h2 className="text-3xl md:text-5xl font-extrabold text-accentGreen tracking-tight">
+              Kosten, Verordnung und nächste Schritte
+            </h2>
+            <p className="text-lg text-textDark/60 leading-relaxed">
+              Ambulante psychiatrische Pflege kann in der Regel über die Krankenversicherung abgerechnet werden, wenn eine ärztliche Verordnung und eine fachliche Bedarfsabklärung vorliegen. Carla erklärt dir oder der zuweisenden Stelle, welche Schritte dafür notwendig sind.
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* Content points as columns */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {points.map((point, idx) => (
-            <div 
-              key={idx} 
-              className="bg-secondary/35 p-8 rounded-[36px] border border-gray-100/60 flex flex-col justify-between hover:shadow-lg transition-all duration-300 group"
-            >
-              <div className="space-y-6">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-gray-50 shadow-sm transition-colors group-hover:bg-accentBrown/10">
-                  {point.icon}
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-accentGreen group-hover:text-accentBrown transition-colors">
-                    {point.title}
-                  </h3>
-                  <p className="text-sm text-textDark/70 leading-relaxed">
-                    {point.description}
-                  </p>
+            <ScrollReveal key={idx} delay={idx * 100} duration={650}>
+              <div 
+                className="bg-secondary/35 p-8 rounded-[36px] border border-gray-100/60 flex flex-col h-full justify-between card-interactive group"
+              >
+                <div className="space-y-6">
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center border border-gray-50 shadow-sm transition-colors group-hover:bg-accentBrown/10">
+                    {point.icon}
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-accentGreen group-hover:text-accentBrown transition-colors">
+                      {point.title}
+                    </h3>
+                    <p className="text-sm text-textDark/70 leading-relaxed">
+                      {point.description}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 

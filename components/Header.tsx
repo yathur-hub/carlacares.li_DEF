@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { path: '/', label: 'Startseite' },
@@ -17,9 +26,13 @@ const Header: React.FC = () => {
   const logoUrl = "https://raw.githubusercontent.com/yathur-hub/carlacares_BrandAssets/main/hand%20tree.png";
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100">
+    <header className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 transition-all duration-300 ${
+      isScrolled ? 'shadow-md/5 py-1 bg-white/98' : 'py-0'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex justify-between items-center h-20 md:h-24">
+        <div className={`flex justify-between items-center transition-all duration-300 ${
+          isScrolled ? 'h-16 md:h-20' : 'h-20 md:h-24'
+        }`}>
           
           {/* Logo Section */}
           <Link 
@@ -27,7 +40,9 @@ const Header: React.FC = () => {
             className="flex items-center space-x-3 cursor-pointer group"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <div className="w-12 h-12 md:w-14 md:h-14 flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
+            <div className={`flex items-center justify-center transition-all duration-500 group-hover:scale-105 ${
+              isScrolled ? 'w-10 h-10 md:w-11 md:h-11' : 'w-12 h-12 md:w-14 md:h-14'
+            }`}>
                <img 
                  src={logoUrl} 
                  alt="CarlaCares Logo Icon" 
@@ -35,8 +50,12 @@ const Header: React.FC = () => {
                />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl md:text-2xl font-bold tracking-tight text-accentGreen leading-none group-hover:text-accentBrown transition-colors">CarlaCares</span>
-              <span className="text-[10px] md:text-[11px] text-accentBrown font-semibold uppercase tracking-wider">Liechtenstein</span>
+              <span className={`font-bold tracking-tight text-accentGreen leading-none group-hover:text-accentBrown transition-all ${
+                isScrolled ? 'text-lg md:text-xl' : 'text-xl md:text-2xl'
+              }`}>CarlaCares</span>
+              <span className={`text-accentBrown font-semibold uppercase tracking-wider transition-all ${
+                isScrolled ? 'text-[9px] mt-0.5' : 'text-[10px] md:text-[11px] mt-1'
+              }`}>Liechtenstein</span>
             </div>
           </Link>
 
